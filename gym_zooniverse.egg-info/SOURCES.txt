@@ -1,0 +1,5 @@
+gym_zooniverse.egg-info/PKG-INFO
+gym_zooniverse.egg-info/SOURCES.txt
+gym_zooniverse.egg-info/dependency_links.txt
+gym_zooniverse.egg-info/requires.txt
+gym_zooniverse.egg-info/top_level.txt
