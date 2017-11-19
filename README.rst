@@ -1,5 +1,5 @@
 gym-zooniverse
 **************
 
-**Custom environments for use with OpenAI gym addressing tasks arising in Zooniverse projects.
+**Custom environments for use with OpenAI gym specifically addressing tasks arising in `Zooniverse <https://www.zooniverse.org/>` projects.**
 
