@@ -71,7 +71,7 @@ class SegmentationTestEnv(gym.Env):
         if pixel_sum == 0:
           reward = 1
         else:
-          reward = 0
+          reward = 1/pixel_sum
         
         obs = np.zeros((self.height,self.range))[:,:,np.newaxis]
         obs[:,x0] += 1
@@ -95,7 +95,7 @@ class SegmentationTestEnv(gym.Env):
         self.state = (state,state)
         
         obs = np.zeros((self.height,self.range))[:,:,np.newaxis]
-        obs[:,self.state[0]] += 1
+        obs[:,self.state[0]] = .5
         self.observation = np.concatenate((self.image[:,:,np.newaxis], self.image[:,:,np.newaxis], obs),axis=2)
         return self.observation
 
