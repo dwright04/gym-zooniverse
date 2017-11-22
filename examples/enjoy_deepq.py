@@ -13,7 +13,7 @@ def main():
     
     env = gym.make(args.env)
     act = deepq.load(args.model)
-
+    env.reset()
     while True:
         obs, done = env.reset(), False
         episode_rew = 0

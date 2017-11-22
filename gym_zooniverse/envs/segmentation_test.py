@@ -39,8 +39,8 @@ class SegmentationTestEnv(gym.Env):
         self.height = 10 # number of pixels on the y-direction
         self.scale = 10 # scale for rendering.
         
-        self.action_space = spaces.Discrete([0,self.range-1])
-        self.action_space.n = 50
+        self.action_space = spaces.Discrete(2)
+        #self.action_space.n = 2
         
         self.observation_space = spaces.Box(low=0, high=1, \
           shape=(self.height, self.range, 3))
@@ -61,8 +61,18 @@ class SegmentationTestEnv(gym.Env):
 
     def _step(self, action):
         assert self.action_space.contains(action)
-        x0, x1 = action, action
-        self.state = (x0, x1)
+        if action == 0: # move right
+          if self.state[0]+1 == self.range:
+            self.state = (self.range-1, self.range-1)
+          else:
+            self.state = (self.state[0]+1, self.state[1]+1)
+        elif action == 1: # move left
+          if self.state[0]-1 < 0:
+            self.state = (0, 0)
+          else:
+            self.state = (self.state[0]-1, self.state[1]-1)
+        
+        (x0, x1) = self.state
         y0, y1 = 1, self.height
         length = int(np.hypot(x1-x0, y1-y0))
         x, y = np.linspace(x0, x1, length), np.linspace(y0, y1, length)
@@ -71,7 +81,8 @@ class SegmentationTestEnv(gym.Env):
         if pixel_sum == 0:
           reward = 1
         else:
-          reward = 1/pixel_sum
+          #reward = 1/pixel_sum
+          reward = 0
         
         obs = np.zeros((self.height,self.range))[:,:,np.newaxis]
         obs[:,x0] += 1
@@ -97,6 +108,7 @@ class SegmentationTestEnv(gym.Env):
         obs = np.zeros((self.height,self.range))[:,:,np.newaxis]
         obs[:,self.state[0]] = .5
         self.observation = np.concatenate((self.image[:,:,np.newaxis], self.image[:,:,np.newaxis], obs),axis=2)
+        #self.viewer = None
         return self.observation
 
     def _render(self, mode='human', close=False):
@@ -149,18 +161,23 @@ def main():
   import matplotlib.pyplot as plt
   
   test = SegmentationTestEnv()
-  observation, reward, done, meta = test.step(25)
-  print(observation.shape)
-  plt.imshow(observation)
-  plt.show()
+  observation, reward, done, meta = test.step(0)
+  #print(observation.shape)
+  #plt.imshow(observation)
+  #plt.show()
   print(test.state, reward)
   test.render()
   input()
-"""
-  observation, reward, done, meta = test.step(np.array([1,49]))
+  observation, reward, done, meta = test.step(0)
   print(test.state, reward)
   test.render()
   input()
+  observation, reward, done, meta = test.step(1)
+  print(test.state, reward)
+  test.render()
+  input()
+  test.render(close=True)
+  """
   observation, reward, done, meta = test.step(np.array([25,49]))
   print(test.state, reward)
   test.render()
