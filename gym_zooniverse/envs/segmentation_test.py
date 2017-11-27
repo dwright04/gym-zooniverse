@@ -95,6 +95,11 @@ class SegmentationTestEnv(gym.Env):
             {"optimal_solution": self.optimal_solution, "guesses": self.guess_count}
     
     def _reset(self):
+        try:
+          self.viewer.close()
+        except AttributeError:
+          pass
+        self.viewer = None
         self.guess_count = 0
         
         # initialise the state of the environment
