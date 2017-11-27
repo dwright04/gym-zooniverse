@@ -48,6 +48,8 @@ class SegmentationTestEnv(gym.Env):
         self.guess_count = 0
         self.guess_max = 2000
         
+        self.gamma = 0.1 # reward scaling factor
+        
         self.viewer = None
 
         self.optimal_solution = 0.
@@ -79,7 +81,7 @@ class SegmentationTestEnv(gym.Env):
         zi = self.image[y.astype(np.int)-1, x.astype(np.int)]
         pixel_sum = np.sum(zi)
         if pixel_sum == 0:
-          reward = 1
+          reward = 1 / (self.gamma*self.guess_count)
         else:
           #reward = 1/pixel_sum
           reward = 0
