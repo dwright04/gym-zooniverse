@@ -81,7 +81,10 @@ class SegmentationTestEnv(gym.Env):
         zi = self.image[y.astype(np.int)-1, x.astype(np.int)]
         pixel_sum = np.sum(zi)
         if pixel_sum == 0:
-          reward = 1 / (self.gamma*self.guess_count)
+          try:
+            reward = 1 / (self.gamma*self.guess_count)
+          except ZeroDivisionError:
+            reward = 1
         else:
           #reward = 1/pixel_sum
           reward = 0
