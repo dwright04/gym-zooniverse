@@ -39,3 +39,6 @@ vizdoom.ini
 
 # assets
 assets/
+
+#pickle files
+*.pkl

@@ -1,1 +1,2 @@
 from gym_zooniverse.envs.segmentation_test import SegmentationTestEnv
+from gym_zooniverse.envs.text_segmentation_test import TextSegmentationTestEnv
