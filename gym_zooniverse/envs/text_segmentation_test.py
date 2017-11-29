@@ -36,7 +36,7 @@ class TextSegmentationTestEnv(gym.Env):
           for file in files:
             if file.endswith('.png'):
               self.assets.append(os.path.join(root, file))
-        print(self.assets)
+
         self._seed()
         self._reset()
 
