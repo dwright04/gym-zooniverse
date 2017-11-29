@@ -7,8 +7,7 @@ import random
 import numpy as np
 from scipy import misc
 from skimage.filters import threshold_otsu
-#import matplotlib.pyplot as plt
-
+from skimage.transform import resize
 
 class TextSegmentationTestEnv(gym.Env):
     """Text Segmentation Test
@@ -20,7 +19,8 @@ class TextSegmentationTestEnv(gym.Env):
 
     def __init__(self, assets_path='../gym_zooniverse/envs/assets'):
 
-        self.scale = 10 # scale for rendering.
+        self.height = 100
+        self.width  = 500
         
         self.action_space = spaces.Discrete(2)
 
@@ -85,20 +85,18 @@ class TextSegmentationTestEnv(gym.Env):
                 self.viewer.close()
                 self.viewer = None
             return
-    
+            
+        line = np.zeros(self.observation.shape)
+        line[:,self.state[0]] += 255
+        img = np.concatenate((self.observation[:,:,np.newaxis]*255, \
+                              line[:,:,np.newaxis],\
+                              np.zeros(self.observation.shape)[:,:,np.newaxis]), axis=2)
         if mode == 'rgb_array':
-            return self.observation
+            return img.astype('uint8')
         elif mode == 'human':
             from gym.envs.classic_control import rendering
             if self.viewer is None:
                 self.viewer = rendering.SimpleImageViewer()
-                #self.viewer = SimpleImageViewer()
-            #print(self.observation[:,:,np.newaxis].shape)
-            line = np.zeros(self.observation.shape)
-            line[:,self.state[0]] += 255
-            img = np.concatenate((self.observation[:,:,np.newaxis]*255, \
-                                  line[:,:,np.newaxis],\
-                                  np.zeros(self.observation.shape)[:,:,np.newaxis]), axis=2)
             self.viewer.imshow(img.astype('uint8'))
             
             
@@ -112,10 +110,12 @@ class TextSegmentationTestEnv(gym.Env):
 
         # initialise the state of the environment
         image = misc.imread(random.choice(self.assets))
+        print(image.shape)
+        image = resize(image, (self.height, self.width))
         thresh = threshold_otsu(image)
         self.image = image > thresh
         
-        self.height, self.width = self.image.shape
+        #self.height, self.width = self.image.shape
         
         if self.width < self.height:
           self.reset()
