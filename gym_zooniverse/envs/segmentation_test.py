@@ -1,10 +1,8 @@
 import gym
 from gym import spaces
 from gym.utils import seeding
+
 import numpy as np
-import scipy.ndimage
-from scipy.misc import toimage
-import cv2
 
 class SegmentationTestEnv(gym.Env):
     """Segementation Test
@@ -64,12 +62,12 @@ class SegmentationTestEnv(gym.Env):
     def _step(self, action):
         assert self.action_space.contains(action)
         if action == 0: # move right
-          if self.state[0]+1 == self.range:
-            self.state = (self.range-1, self.range-1)
+          if self.state[0] + 1 == self.range:
+            pass
           else:
             self.state = (self.state[0]+1, self.state[1]+1)
         elif action == 1: # move left
-          if self.state[0]-1 < 0:
+          if self.state[0] - 1 < 0:
             self.state = (0, 0)
           else:
             self.state = (self.state[0]-1, self.state[1]-1)
@@ -86,7 +84,6 @@ class SegmentationTestEnv(gym.Env):
           except ZeroDivisionError:
             reward = 1
         else:
-          #reward = 1/pixel_sum
           reward = 0
         
         obs = np.zeros((self.height,self.range))[:,:,np.newaxis]
