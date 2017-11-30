@@ -17,15 +17,17 @@ class TextSegmentationTestEnv(gym.Env):
         'video.frames_per_second' : 10
     }
 
-    def __init__(self, assets_path='../gym_zooniverse/envs/assets'):
+    def __init__(self, assets_path='/Users/dwright/dev/gym-zooniverse/gym_zooniverse/envs'):
 
         self.height = 100
         self.width  = 500
+        self.fps=10 # added for rl-teacher
         
         self.action_space = spaces.Discrete(2)
 
         self.guess_count = 0
         self.guess_max = 2000
+        self._max_episode_steps = 2000 # added for rl-teacher
         
         self.gamma = 0.1 # reward scaling factor
         
@@ -134,7 +136,9 @@ class TextSegmentationTestEnv(gym.Env):
 def main():
   import matplotlib.pyplot as plt
   
-  env = SegmentationTextTestEnv('./assets')
+  env = TextSegmentationTestEnv()
+  print(hasattr(env,'guess_max'))
+  print(env.guess_max)
   plt.imshow(env.observation, cmap='gray')
   plt.show()
 
