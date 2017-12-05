@@ -114,12 +114,9 @@ class TextSegmentationTestEnv(gym.Env):
 
         # initialise the state of the environment
         image = misc.imread(random.choice(self.assets))
-        print(image.shape)
         image = resize(image, (self.height, self.width))
         thresh = threshold_otsu(image)
         self.image = image > thresh
-        
-        #self.height, self.width = self.image.shape
         
         if self.width < self.height:
           self.reset()
@@ -128,7 +125,6 @@ class TextSegmentationTestEnv(gym.Env):
           shape=(self.height, self.width, 3))
 
         state = np.random.randint(0,self.width/self.scale)*self.scale
-        print(state)
         self.state = (state,state)
 
         self.observation = self.image.astype('float').copy()
