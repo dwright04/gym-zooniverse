@@ -21,6 +21,7 @@ class TextSegmentationTestEnv(gym.Env):
 
         self.height = 100
         self.width  = 500
+        self.scale = 10
         self.fps=10 # added for rl-teacher
         
         self.action_space = spaces.Discrete(2)
@@ -49,15 +50,15 @@ class TextSegmentationTestEnv(gym.Env):
     def _step(self, action):
         assert self.action_space.contains(action)
         if action == 0: # move right
-          if self.state[0] + 1 == self.width:
+          if self.state[0] + 1*self.scale == self.width:
             pass
           else:
-            self.state = (self.state[0]+1, self.state[1]+1)
+            self.state = (self.state[0]+1*self.scale, self.state[1]+1*self.scale)
         elif action == 1: # move left
-          if self.state[0] - 1 < 0:
+          if self.state[0] - 1*self.scale < 0:
             self.state = (0, 0)
           else:
-            self.state = (self.state[0]-1, self.state[1]-1)
+            self.state = (self.state[0]-1*self.scale, self.state[1]-1*self.scale)
         
         (x0, x1) = self.state
         y0, y1 = 1, self.height
@@ -94,14 +95,15 @@ class TextSegmentationTestEnv(gym.Env):
                               line[:,:,np.newaxis],\
                               np.zeros(self.observation.shape)[:,:,np.newaxis]), axis=2)
         if mode == 'rgb_array':
+            #img = self.observation
             return img.astype('uint8')
+            #return img
         elif mode == 'human':
             from gym.envs.classic_control import rendering
             if self.viewer is None:
                 self.viewer = rendering.SimpleImageViewer()
             self.viewer.imshow(img.astype('uint8'))
-            
-            
+    
     def _reset(self):
         try:
           self.viewer.close()
@@ -125,7 +127,8 @@ class TextSegmentationTestEnv(gym.Env):
         self.observation_space = spaces.Box(low=0, high=1, \
           shape=(self.height, self.width, 3))
 
-        state = np.random.randint(0,self.width)
+        state = np.random.randint(0,self.width/self.scale)*self.scale
+        print(state)
         self.state = (state,state)
 
         self.observation = self.image.astype('float').copy()
