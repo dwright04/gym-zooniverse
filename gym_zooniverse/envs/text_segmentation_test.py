@@ -14,7 +14,7 @@ class TextSegmentationTestEnv(gym.Env):
     """
     metadata = {
         'render.modes': ['human', 'rgb_array'],
-        'video.frames_per_second' : 10
+        'video.frames_per_second' : 30
     }
 
     def __init__(self, assets_path='/Users/dwright/dev/gym-zooniverse/gym_zooniverse/envs'):
@@ -22,7 +22,7 @@ class TextSegmentationTestEnv(gym.Env):
         self.height = 100
         self.width  = 500
         self.scale = 10
-        self.fps=10 # added for rl-teacher
+        self.fps=30 # added for rl-teacher
         
         self.action_space = spaces.Discrete(2)
 
@@ -34,6 +34,11 @@ class TextSegmentationTestEnv(gym.Env):
         
         self.viewer = None
         
+        self.word_map = {}
+        for line in open(assets_path+'/words.txt').readlines():
+          if '#' in line:
+            continue
+          self.word_map[line.strip().split(' ')[0]+'.png'] = line.strip().split(' ')[-1]
         self.assets = []
         for root, dirs, files in os.walk(assets_path):
           for file in files:
@@ -74,8 +79,7 @@ class TextSegmentationTestEnv(gym.Env):
         else:
           reward = 0
         
-        self.observation = self.image.astype('float').copy()
-        self.observation[:, x0] = .5
+        self.observation = self._get_obs()
         
         self.guess_count += 1
         done = self.guess_count >= self.guess_max
@@ -121,16 +125,28 @@ class TextSegmentationTestEnv(gym.Env):
         if self.width < self.height:
           self.reset()
         
-        self.observation_space = spaces.Box(low=0, high=1, \
+        #self.observation_space = spaces.Box(low=0, high=1, \
+        #  shape=(self.height, self.width, 3))
+        
+        self.observation_space = spaces.Box(low=0, high=255, \
           shape=(self.height, self.width, 3))
 
         state = np.random.randint(0,self.width/self.scale)*self.scale
         self.state = (state,state)
 
-        self.observation = self.image.astype('float').copy()
-        self.observation[:, self.state[0]] = .5
+        #self.observation = self.image.astype('float').copy()
+        #self.observation[:, self.state[0]] = .5
+        self.observation = self._get_obs()
         return self.observation
 
+    def _get_obs(self):
+        obs = self.image.astype('float').copy()
+        line = np.zeros(obs.shape)
+        line[:,self.state[0]] += 255
+        obs = np.concatenate((obs[:,:,np.newaxis]*255, \
+                              line[:,:,np.newaxis],\
+                              np.zeros(obs.shape)[:,:,np.newaxis]), axis=2)
+        return obs
 
 def main():
   import matplotlib.pyplot as plt
@@ -138,7 +154,7 @@ def main():
   env = TextSegmentationTestEnv()
   print(hasattr(env,'guess_max'))
   print(env.guess_max)
-  plt.imshow(env.observation, cmap='gray')
+  plt.imshow(env.observation, cmap='jet')
   plt.show()
 
   env.step(1)
